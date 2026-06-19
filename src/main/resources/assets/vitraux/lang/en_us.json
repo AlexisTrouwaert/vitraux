@@ -1,0 +1,29 @@
+{
+  "itemGroup.vitraux.vitraux": "Vitraux",
+
+  "block.vitraux.white_vitraux":      "White Vitraux",
+  "block.vitraux.orange_vitraux":     "Orange Vitraux",
+  "block.vitraux.magenta_vitraux":    "Magenta Vitraux",
+  "block.vitraux.light_blue_vitraux": "Light Blue Vitraux",
+  "block.vitraux.yellow_vitraux":     "Yellow Vitraux",
+  "block.vitraux.lime_vitraux":       "Lime Vitraux",
+  "block.vitraux.pink_vitraux":       "Pink Vitraux",
+  "block.vitraux.gray_vitraux":       "Gray Vitraux",
+  "block.vitraux.light_gray_vitraux": "Light Gray Vitraux",
+  "block.vitraux.cyan_vitraux":       "Cyan Vitraux",
+  "block.vitraux.purple_vitraux":     "Purple Vitraux",
+  "block.vitraux.blue_vitraux":       "Blue Vitraux",
+  "block.vitraux.brown_vitraux":      "Brown Vitraux",
+  "block.vitraux.green_vitraux":      "Green Vitraux",
+  "block.vitraux.red_vitraux":        "Red Vitraux",
+  "block.vitraux.black_vitraux":      "Black Vitraux",
+
+  "block.vitraux.blank_vitraux":   "Blank Vitraux",
+  "block.vitraux.glaziers_bench":  "Glazier's Bench",
+
+  "item.vitraux.pincette": "Glazier's Pincers",
+  "item.vitraux.template": "Vitraux Template",
+
+  "container.vitraux.glaziers_bench": "Glazier's Bench",
+  "gui.vitraux.create_template": "Create Template"
+}

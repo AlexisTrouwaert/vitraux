@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "vitraux:block/glaziers_bench" },
+    "facing=south": { "model": "vitraux:block/glaziers_bench", "y": 180 },
+    "facing=east":  { "model": "vitraux:block/glaziers_bench", "y": 90 },
+    "facing=west":  { "model": "vitraux:block/glaziers_bench", "y": 270 }
+  }
+}

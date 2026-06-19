@@ -1,0 +1,24 @@
+{
+  "multipart": [
+    { "when": { "north": "true" }, "apply": { "model": "vitraux:block/custom_vitraux_side",     "uvlock": true } },
+    { "when": { "east":  "true" }, "apply": { "model": "vitraux:block/custom_vitraux_side",     "uvlock": true, "y": 90 } },
+    { "when": { "south": "true" }, "apply": { "model": "vitraux:block/custom_vitraux_side_alt", "uvlock": true } },
+    { "when": { "west":  "true" }, "apply": { "model": "vitraux:block/custom_vitraux_side_alt", "uvlock": true, "y": 90 } },
+    { "when": { "north": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_noside",     "uvlock": true } },
+    { "when": { "east":  "false" }, "apply": { "model": "vitraux:block/custom_vitraux_noside_alt", "uvlock": true } },
+    { "when": { "south": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_noside_alt", "uvlock": true, "y": 90 } },
+    { "when": { "west":  "false" }, "apply": { "model": "vitraux:block/custom_vitraux_noside",     "uvlock": true, "y": 270 } },
+
+    { "when": { "connected_up": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_post_cap_up" } },
+    { "when": { "north": "true", "connected_up": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_side_cap_up", "uvlock": true } },
+    { "when": { "east":  "true", "connected_up": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_side_cap_up", "uvlock": true, "y": 90 } },
+    { "when": { "south": "true", "connected_up": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_side_cap_up", "uvlock": true, "y": 180 } },
+    { "when": { "west":  "true", "connected_up": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_side_cap_up", "uvlock": true, "y": 270 } },
+
+    { "when": { "connected_down": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_post_cap_down" } },
+    { "when": { "north": "true", "connected_down": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_side_cap_down", "uvlock": true } },
+    { "when": { "east":  "true", "connected_down": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_side_cap_down", "uvlock": true, "y": 90 } },
+    { "when": { "south": "true", "connected_down": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_side_cap_down", "uvlock": true, "y": 180 } },
+    { "when": { "west":  "true", "connected_down": "false" }, "apply": { "model": "vitraux:block/custom_vitraux_side_cap_down", "uvlock": true, "y": 270 } }
+  ]
+}

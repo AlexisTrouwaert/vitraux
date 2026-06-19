@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top":   "vitraux:block/glaziers_bench_top",
+    "front": "vitraux:block/glaziers_bench_front",
+    "side":  "vitraux:block/glaziers_bench_side"
+  }
+}

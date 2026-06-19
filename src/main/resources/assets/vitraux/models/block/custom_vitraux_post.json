@@ -1,0 +1,8 @@
+{
+    "ambientocclusion": false,
+    "textures": {
+        "particle": "vitraux:block/vitraux_frame",
+        "edge": "vitraux:block/vitraux_frame"
+    },
+    "elements": []
+}

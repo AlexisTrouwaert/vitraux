@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "vitraux",
+  "version": "${version}",
+  "name": "Vitraux",
+  "description": "Adds decorative stained glass panes (vitraux) with pre-made terracotta patterns and a custom pixel-art editor for creating unique designs.",
+  "authors": [
+    "alexis"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.alexis.vitraux.VitrauxMod"
+    ],
+    "client": [
+      "com.alexis.vitraux.VitrauxModClient"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21.1",
+    "java": ">=21"
+  },
+  "suggests": {
+    "iris": "*",
+    "sodium": "*"
+  }
+}

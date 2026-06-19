@@ -1,0 +1,15 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "GGG",
+    "GGG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:light_blue_glazed_terracotta" }
+  },
+  "result": {
+    "id": "vitraux:light_blue_vitraux",
+    "count": 6
+  }
+}

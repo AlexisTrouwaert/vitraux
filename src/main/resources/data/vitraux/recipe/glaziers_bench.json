@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GG",
+    "WW"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass_pane" },
+    "W": { "item": "minecraft:oak_planks" }
+  },
+  "result": { "id": "vitraux:glaziers_bench", "count": 1 }
+}

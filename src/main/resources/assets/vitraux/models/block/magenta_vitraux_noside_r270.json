@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_glass_pane_noside",
+  "textures": {
+    "pane": "vitraux:block/magenta_vitraux_r270",
+    "edge": "vitraux:block/vitraux_frame"
+  }
+}

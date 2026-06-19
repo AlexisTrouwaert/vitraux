@@ -1,0 +1,22 @@
+{
+  "itemGroup.vitraux.vitraux": "Vitraux",
+
+  "block.vitraux.white_vitraux":      "Vitrail blanc",
+  "block.vitraux.orange_vitraux":     "Vitrail orange",
+  "block.vitraux.magenta_vitraux":    "Vitrail magenta",
+  "block.vitraux.light_blue_vitraux": "Vitrail bleu clair",
+  "block.vitraux.yellow_vitraux":     "Vitrail jaune",
+  "block.vitraux.lime_vitraux":       "Vitrail vert clair",
+  "block.vitraux.pink_vitraux":       "Vitrail rose",
+  "block.vitraux.gray_vitraux":       "Vitrail gris",
+  "block.vitraux.light_gray_vitraux": "Vitrail gris clair",
+  "block.vitraux.cyan_vitraux":       "Vitrail cyan",
+  "block.vitraux.purple_vitraux":     "Vitrail violet",
+  "block.vitraux.blue_vitraux":       "Vitrail bleu",
+  "block.vitraux.brown_vitraux":      "Vitrail marron",
+  "block.vitraux.green_vitraux":      "Vitrail vert",
+  "block.vitraux.red_vitraux":        "Vitrail rouge",
+  "block.vitraux.black_vitraux":      "Vitrail noir",
+
+  "item.vitraux.pincette": "Pincette de Vitrailliste"
+}

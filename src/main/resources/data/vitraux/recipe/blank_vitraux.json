@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "GGG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass_pane" }
+  },
+  "result": { "id": "vitraux:blank_vitraux", "count": 6 }
+}

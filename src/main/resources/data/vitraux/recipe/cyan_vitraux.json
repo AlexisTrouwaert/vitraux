@@ -1,0 +1,15 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "GGG",
+    "GGG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:cyan_glazed_terracotta" }
+  },
+  "result": {
+    "id": "vitraux:cyan_vitraux",
+    "count": 6
+  }
+}

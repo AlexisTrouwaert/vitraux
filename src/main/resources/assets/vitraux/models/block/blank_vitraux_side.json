@@ -1,0 +1,1 @@
+{ "parent": "minecraft:block/template_glass_pane_side",    "textures": { "pane": "vitraux:block/blank_vitraux", "edge": "vitraux:block/vitraux_frame" } }

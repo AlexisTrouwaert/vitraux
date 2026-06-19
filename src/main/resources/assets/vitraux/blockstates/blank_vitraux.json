@@ -1,0 +1,13 @@
+{
+  "multipart": [
+    { "apply": { "model": "vitraux:block/blank_vitraux_post" } },
+    { "when": { "north": "true" }, "apply": { "model": "vitraux:block/blank_vitraux_side",     "uvlock": true } },
+    { "when": { "east":  "true" }, "apply": { "model": "vitraux:block/blank_vitraux_side",     "uvlock": true, "y": 90 } },
+    { "when": { "south": "true" }, "apply": { "model": "vitraux:block/blank_vitraux_side_alt", "uvlock": true } },
+    { "when": { "west":  "true" }, "apply": { "model": "vitraux:block/blank_vitraux_side_alt", "uvlock": true, "y": 90 } },
+    { "when": { "north": "false" }, "apply": { "model": "vitraux:block/blank_vitraux_noside",     "uvlock": true } },
+    { "when": { "east":  "false" }, "apply": { "model": "vitraux:block/blank_vitraux_noside_alt", "uvlock": true } },
+    { "when": { "south": "false" }, "apply": { "model": "vitraux:block/blank_vitraux_noside_alt", "uvlock": true, "y": 90 } },
+    { "when": { "west":  "false" }, "apply": { "model": "vitraux:block/blank_vitraux_noside",     "uvlock": true, "y": 270 } }
+  ]
+}

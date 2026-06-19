@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "I",
+    "I"
+  ],
+  "key": {
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": {
+    "id": "vitraux:pincette",
+    "count": 1
+  }
+}

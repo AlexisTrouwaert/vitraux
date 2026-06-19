@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_glass_pane_side_alt",
+  "textures": {
+    "pane": "vitraux:block/yellow_vitraux_r180",
+    "edge": "vitraux:block/vitraux_frame"
+  }
+}

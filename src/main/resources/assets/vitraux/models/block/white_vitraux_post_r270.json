@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_glass_pane_post",
+  "textures": {
+    "pane": "vitraux:block/white_vitraux_r270",
+    "edge": "vitraux:block/vitraux_frame"
+  }
+}
