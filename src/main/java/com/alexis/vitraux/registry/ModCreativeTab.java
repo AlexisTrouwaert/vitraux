@@ -22,7 +22,9 @@ public class ModCreativeTab {
             entries.add(ModBlocks.BLANK_VITRAUX);
             entries.add(ModBlocks.GLAZIERS_BENCH);
             entries.add(ModItems.PINCETTE);
+            entries.add(ModItems.BLANK_TEMPLATE);
             entries.add(ModItems.TEMPLATE);
+            entries.add(ModItems.BLUEPRINT);
         })
         .build();
 

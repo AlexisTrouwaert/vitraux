@@ -4,15 +4,20 @@ import com.alexis.vitraux.block.entity.GlaziersBenchBlockEntity;
 import com.alexis.vitraux.network.CreateTemplateC2SPayload;
 import com.alexis.vitraux.network.FillCellC2SPayload;
 import com.alexis.vitraux.network.FillRectC2SPayload;
+import com.alexis.vitraux.network.LoadBlueprintC2SPayload;
+import com.alexis.vitraux.network.SaveDesignC2SPayload;
 import com.alexis.vitraux.network.SetDimensionsC2SPayload;
 import com.alexis.vitraux.network.SetPixelC2SPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
+import org.lwjgl.glfw.GLFW;
 
 public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandler> {
 
@@ -23,30 +28,46 @@ public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandle
     private int editCellCol = -1;
     private int editCellRow = -1;
 
-    // Left panel: full-canvas preview (always visible)
+    // Left panel: full-canvas preview (stage 2 only)
     private static final int PREV_X    = 7;
-    private static final int PREV_Y    = 17;
+    private static final int PREV_Y    = 44;
     private static final int PREV_SIZE = 128;
 
-    // Right panel: cell editor (visible in MODE_CELL_EDIT)
+    // Right panel: cell editor (stage 2 only, visible in MODE_CELL_EDIT)
     private static final int EDIT_X    = 145;
-    private static final int EDIT_Y    = 17;
+    private static final int EDIT_Y    = 44;
     private static final int EDIT_SIZE = 128;   // 16 texels × 8 px/texel
     private static final int EDIT_PX   = 8;
 
     // Neighbor reference strip thickness (outside the editor border)
     private static final int NEIGHBOR_PX = 4;
 
-    // Palette: horizontal row below the panels
+    // Palette: horizontal row below the panels (stage 2 only)
     private static final int PAL_X      = 7;
-    private static final int PAL_Y      = 153;
+    private static final int PAL_Y      = 180;
     private static final int SWATCH     = 12;
     private static final int SWATCH_GAP = 2;    // slot width = SWATCH + SWATCH_GAP = 14
 
+    // Dimension / fill / back buttons row (stage 2 only)
+    private static final int BUTTON_ROW_Y = 196;
+
+    // Name field + create button row (stage 2 only)
+    private static final int CREATE_ROW_Y = 216;
+
+    // Stage 2 placeholder bounding box (shown instead when no template inserted)
+    private static final int STAGE2_X0 = 7,   STAGE2_Y0 = 44;
+    private static final int STAGE2_X1 = 273, STAGE2_Y1 = 234;
+
     private static final int[] PALETTE_ARGB = buildPalette();
 
+    private ButtonWidget wMinusButton, wPlusButton, hMinusButton, hPlusButton;
     private ButtonWidget backButton;
     private ButtonWidget fillButton;
+    private ButtonWidget loadButton;
+    private ButtonWidget createButton;
+    private ButtonWidget saveButton;
+    private TextFieldWidget nameField;
+    private boolean hadBlueprintLoaded = false;
 
     // Rectangle selection state (right-click drag)
     private boolean rectDragging = false;
@@ -56,28 +77,32 @@ public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandle
     public GlaziersBenchScreen(GlaziersBenchScreenHandler handler, PlayerInventory inv, Text title) {
         super(handler, inv, title);
         this.backgroundWidth  = 280;
-        this.backgroundHeight = 200;
+        this.backgroundHeight = 330;
     }
 
     @Override
     protected void init() {
         super.init();
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("W-"), b -> changeDim(-1, 0))
-            .dimensions(x + 7,  y + 169, 20, 16).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("W+"), b -> changeDim(+1, 0))
-            .dimensions(x + 29, y + 169, 20, 16).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("H-"), b -> changeDim(0, -1))
-            .dimensions(x + 53, y + 169, 20, 16).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("H+"), b -> changeDim(0, +1))
-            .dimensions(x + 75, y + 169, 20, 16).build());
+        wMinusButton = ButtonWidget.builder(Text.literal("W-"), b -> changeDim(-1, 0))
+            .dimensions(x + 7,  y + BUTTON_ROW_Y, 20, 16).build();
+        wPlusButton = ButtonWidget.builder(Text.literal("W+"), b -> changeDim(+1, 0))
+            .dimensions(x + 29, y + BUTTON_ROW_Y, 20, 16).build();
+        hMinusButton = ButtonWidget.builder(Text.literal("H-"), b -> changeDim(0, -1))
+            .dimensions(x + 53, y + BUTTON_ROW_Y, 20, 16).build();
+        hPlusButton = ButtonWidget.builder(Text.literal("H+"), b -> changeDim(0, +1))
+            .dimensions(x + 75, y + BUTTON_ROW_Y, 20, 16).build();
+        addDrawableChild(wMinusButton);
+        addDrawableChild(wPlusButton);
+        addDrawableChild(hMinusButton);
+        addDrawableChild(hPlusButton);
 
-        addDrawableChild(ButtonWidget.builder(
-                Text.translatable("gui.vitraux.create_template"), b -> createTemplate())
-            .dimensions(x + 100, y + 169, 74, 16).build());
+        loadButton = ButtonWidget.builder(Text.translatable("gui.vitraux.load_design"), b -> loadDesign())
+            .dimensions(x + 99, y + BUTTON_ROW_Y, 74, 16).build();
+        addDrawableChild(loadButton);
 
         fillButton = ButtonWidget.builder(Text.literal("Fill"), b -> fillCell())
-            .dimensions(x + 177, y + 169, 36, 16).build();
+            .dimensions(x + 177, y + BUTTON_ROW_Y, 36, 16).build();
         addDrawableChild(fillButton);
 
         backButton = ButtonWidget.builder(Text.literal("< Back"), b -> {
@@ -85,16 +110,70 @@ public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandle
             editCellCol = -1;
             editCellRow = -1;
             rectDragging = false;
-        }).dimensions(x + 216, y + 169, 58, 16).build();
+        }).dimensions(x + 216, y + BUTTON_ROW_Y, 58, 16).build();
         addDrawableChild(backButton);
+
+        nameField = new TextFieldWidget(textRenderer, x + 7, y + CREATE_ROW_Y + 1, 100, 16,
+            Text.translatable("gui.vitraux.template_name"));
+        nameField.setMaxLength(32);
+        nameField.setText("Template");
+        addDrawableChild(nameField);
+
+        createButton = ButtonWidget.builder(
+                Text.translatable("gui.vitraux.create_button"), b -> createTemplate())
+            .dimensions(x + 111, y + CREATE_ROW_Y, 70, 18).build();
+        addDrawableChild(createButton);
+
+        saveButton = ButtonWidget.builder(
+                Text.translatable("gui.vitraux.save_design"), b -> saveDesign())
+            .dimensions(x + 185, y + CREATE_ROW_Y, 88, 18).build();
+        addDrawableChild(saveButton);
+    }
+
+    private boolean stage2Active() {
+        return handler.hasBlankTemplate() || handler.hasBlueprint();
+    }
+
+    @Override
+    protected void handledScreenTick() {
+        super.handledScreenTick();
+        if (nameField == null) return;
+
+        ItemStack blueprintStack = handler.getSlot(1).getStack();
+        boolean hasBlueprint = !blueprintStack.isEmpty();
+        if (hasBlueprint && !hadBlueprintLoaded) {
+            nameField.setText(blueprintStack.getName().getString());
+        } else if (!hasBlueprint && hadBlueprintLoaded) {
+            nameField.setText("Template");
+        }
+        hadBlueprintLoaded = hasBlueprint;
     }
 
     // ── Rendering ─────────────────────────────────────────────────────────────
 
     @Override
+    public void render(DrawContext ctx, int mx, int my, float delta) {
+        super.render(ctx, mx, my, delta);
+        // HandledScreen doesn't call this on its own; every concrete screen must trigger it itself.
+        this.drawMouseoverTooltip(ctx, mx, my);
+    }
+
+    @Override
     protected void drawBackground(DrawContext ctx, float delta, int mx, int my) {
-        backButton.visible = (mode == MODE_CELL_EDIT);
-        fillButton.visible = (mode == MODE_CELL_EDIT);
+        boolean stage2 = stage2Active();
+        boolean hasBlankTemplate = handler.hasBlankTemplate();
+        boolean hasBlueprint = handler.hasBlueprint();
+
+        wMinusButton.visible = stage2;
+        wPlusButton.visible  = stage2;
+        hMinusButton.visible = stage2;
+        hPlusButton.visible  = stage2;
+        loadButton.visible   = hasBlueprint;
+        fillButton.visible   = stage2 && mode == MODE_CELL_EDIT;
+        backButton.visible   = stage2 && mode == MODE_CELL_EDIT;
+        nameField.visible    = stage2;
+        createButton.visible = hasBlankTemplate;
+        saveButton.visible   = stage2;
 
         int bg = 0xFFC6C6C6;
         int brd = 0xFF555555;
@@ -103,23 +182,62 @@ public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandle
 
         ctx.drawText(textRenderer, getTitle(), x + 8, y + 6, 0x404040, false);
 
-        GlaziersBenchScreenHandler h = handler;
-        String dimLabel = h.getCanvasWidth() + " x " + h.getCanvasHeight();
-        ctx.drawText(textRenderer, dimLabel, x + EDIT_X, y + 153, 0x404040, false);
+        // Input slot backgrounds (items themselves are drawn by HandledScreen)
+        drawSlotBackground(ctx,
+            x + GlaziersBenchScreenHandler.TEMPLATE_SLOT_X,
+            y + GlaziersBenchScreenHandler.TEMPLATE_SLOT_Y);
+        drawSlotBackground(ctx,
+            x + GlaziersBenchScreenHandler.BLUEPRINT_SLOT_X,
+            y + GlaziersBenchScreenHandler.BLUEPRINT_SLOT_Y);
 
-        drawPreviewPanel(ctx, mx, my);
-
-        if (mode == MODE_CELL_EDIT && editCellCol >= 0) {
-            drawEditorPanel(ctx, mx, my);
-        } else {
-            ctx.fill(x + EDIT_X, y + EDIT_Y,
-                     x + EDIT_X + EDIT_SIZE, y + EDIT_Y + EDIT_SIZE, 0xFF888888);
-            ctx.drawCenteredTextWithShadow(textRenderer,
-                Text.literal("Click a cell"),
-                x + EDIT_X + EDIT_SIZE / 2, y + EDIT_Y + EDIT_SIZE / 2 - 4, 0xAAAAAA);
+        // Player inventory + hotbar slot backgrounds (always visible)
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) {
+                drawSlotBackground(ctx,
+                    x + GlaziersBenchScreenHandler.INV_X + col * 18,
+                    y + GlaziersBenchScreenHandler.INV_Y + row * 18);
+            }
+        }
+        for (int col = 0; col < 9; col++) {
+            drawSlotBackground(ctx,
+                x + GlaziersBenchScreenHandler.INV_X + col * 18,
+                y + GlaziersBenchScreenHandler.HOTBAR_Y);
         }
 
-        drawPalette(ctx, mx, my);
+        if (!hasBlankTemplate) {
+            ctx.drawText(textRenderer, Text.translatable("gui.vitraux.insert_hint"),
+                x + GlaziersBenchScreenHandler.TEMPLATE_SLOT_X + 50, y + 25, 0x404040, false);
+        }
+        if (!hasBlueprint) {
+            ctx.drawText(textRenderer, Text.translatable("gui.vitraux.insert_blueprint_hint"),
+                x + GlaziersBenchScreenHandler.TEMPLATE_SLOT_X + 50, y + 34, 0x707070, false);
+        }
+
+        if (!stage2) {
+            ctx.fill(x + STAGE2_X0, y + STAGE2_Y0, x + STAGE2_X1, y + STAGE2_Y1, 0xFF999999);
+            ctx.drawBorder(x + STAGE2_X0, y + STAGE2_Y0, STAGE2_X1 - STAGE2_X0, STAGE2_Y1 - STAGE2_Y0, 0xFF555555);
+            ctx.drawCenteredTextWithShadow(textRenderer,
+                Text.translatable("gui.vitraux.insert_hint"),
+                x + (STAGE2_X0 + STAGE2_X1) / 2, y + (STAGE2_Y0 + STAGE2_Y1) / 2 - 4, 0xDDDDDD);
+        } else {
+            GlaziersBenchScreenHandler h = handler;
+            String dimLabel = h.getCanvasWidth() + " x " + h.getCanvasHeight();
+            ctx.drawText(textRenderer, dimLabel, x + EDIT_X, y + PAL_Y, 0x404040, false);
+
+            drawPreviewPanel(ctx, mx, my);
+
+            if (mode == MODE_CELL_EDIT && editCellCol >= 0) {
+                drawEditorPanel(ctx, mx, my);
+            } else {
+                ctx.fill(x + EDIT_X, y + EDIT_Y,
+                         x + EDIT_X + EDIT_SIZE, y + EDIT_Y + EDIT_SIZE, 0xFF888888);
+                ctx.drawCenteredTextWithShadow(textRenderer,
+                    Text.literal("Click a cell"),
+                    x + EDIT_X + EDIT_SIZE / 2, y + EDIT_Y + EDIT_SIZE / 2 - 4, 0xAAAAAA);
+            }
+
+            drawPalette(ctx, mx, my);
+        }
     }
 
     @Override
@@ -353,7 +471,13 @@ public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandle
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        if (button == 0) {
+        if (nameField != null && nameField.visible && !nameField.isMouseOver(mx, my)) {
+            nameField.setFocused(false);
+        }
+
+        boolean stage2 = stage2Active();
+
+        if (button == 0 && stage2) {
             // Palette click
             int prx = (int) mx - x - PAL_X;
             int pry = (int) my - y - PAL_Y;
@@ -393,7 +517,7 @@ public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandle
                     return true;
                 }
             }
-        } else if (button == 1) {
+        } else if (button == 1 && stage2) {
             // Editor right-click: start rectangle selection
             if (mode == MODE_CELL_EDIT && editCellCol >= 0) {
                 int erx = (int) mx - x - EDIT_X;
@@ -413,7 +537,7 @@ public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandle
 
     @Override
     public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
-        if (button == 0 && mode == MODE_CELL_EDIT && editCellCol >= 0) {
+        if (button == 0 && stage2Active() && mode == MODE_CELL_EDIT && editCellCol >= 0) {
             int erx = (int) mx - x - EDIT_X;
             int ery = (int) my - y - EDIT_Y;
             if (erx >= 0 && ery >= 0 && erx < EDIT_SIZE && ery < EDIT_SIZE) {
@@ -438,6 +562,33 @@ public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandle
             return true;
         }
         return super.mouseReleased(mx, my, button);
+    }
+
+    // ── Keyboard interaction ─────────────────────────────────────────────────
+    // The name field only consumes printable characters via charTyped, not raw
+    // keyPresses (W/A/S/D/E etc.), so without this override those keys would
+    // leak through to the player's movement / inventory-toggle keybindings
+    // while typing and yank the player out of the GUI.
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (nameField != null && nameField.isFocused()) {
+            if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+                this.close();
+                return true;
+            }
+            nameField.keyPressed(keyCode, scanCode, modifiers);
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        if (nameField != null && nameField.isFocused()) {
+            return nameField.charTyped(chr, modifiers);
+        }
+        return super.charTyped(chr, modifiers);
     }
 
     private void paintPixel(int erx, int ery) {
@@ -505,10 +656,30 @@ public class GlaziersBenchScreen extends HandledScreen<GlaziersBenchScreenHandle
     }
 
     private void createTemplate() {
-        ClientPlayNetworking.send(new CreateTemplateC2SPayload(handler.syncId));
+        if (!handler.hasBlankTemplate()) return;
+        String name = nameField.getText().trim();
+        if (name.isEmpty()) name = "Template";
+        ClientPlayNetworking.send(new CreateTemplateC2SPayload(handler.syncId, name));
+    }
+
+    private void saveDesign() {
+        if (!stage2Active()) return;
+        String name = nameField.getText().trim();
+        if (name.isEmpty()) name = "Blueprint";
+        ClientPlayNetworking.send(new SaveDesignC2SPayload(handler.syncId, name));
+    }
+
+    private void loadDesign() {
+        if (!handler.hasBlueprint()) return;
+        ClientPlayNetworking.send(new LoadBlueprintC2SPayload(handler.syncId));
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private void drawSlotBackground(DrawContext ctx, int sx, int sy) {
+        ctx.fill(sx - 1, sy - 1, sx + 17, sy + 17, 0xFF8B8B8B);
+        ctx.fill(sx, sy, sx + 16, sy + 16, 0xFF373737);
+    }
 
     private void drawCheckerboard(DrawContext ctx, int sx, int sy, int sw, int sh) {
         ctx.fill(sx, sy, sx + sw, sy + sh, 0xFFAAAAAA);

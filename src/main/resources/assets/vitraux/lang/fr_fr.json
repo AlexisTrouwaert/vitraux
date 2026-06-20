@@ -18,5 +18,21 @@
   "block.vitraux.red_vitraux":        "Vitrail rouge",
   "block.vitraux.black_vitraux":      "Vitrail noir",
 
-  "item.vitraux.pincette": "Pincette de Vitrailliste"
+  "block.vitraux.blank_vitraux":   "Vitrail vierge",
+  "block.vitraux.glaziers_bench":  "Établi de Vitrailliste",
+
+  "item.vitraux.pincette": "Pincette de Vitrailliste",
+  "item.vitraux.template": "Modèle de Vitrail",
+  "item.vitraux.blank_template": "Modèle vierge",
+  "item.vitraux.blueprint": "Plan de Vitrail",
+
+  "container.vitraux.glaziers_bench": "Établi de Vitrailliste",
+  "gui.vitraux.create_template": "Créer le modèle",
+  "gui.vitraux.create_button": "Créer",
+  "gui.vitraux.save_design": "Sauvegarder",
+  "gui.vitraux.load_design": "Recharger",
+  "gui.vitraux.template_name": "Nom",
+  "gui.vitraux.insert_hint": "Insérez un modèle vierge",
+  "gui.vitraux.insert_blueprint_hint": "Insérez un plan pour le charger automatiquement (optionnel)",
+  "tooltip.vitraux.canvas_size": "%s x %s cellules"
 }

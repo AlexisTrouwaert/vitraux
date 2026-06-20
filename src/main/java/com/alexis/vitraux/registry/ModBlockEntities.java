@@ -10,8 +10,8 @@ import net.minecraft.util.Identifier;
 
 public class ModBlockEntities {
 
-    public static BlockEntityType<CustomVitrauxBlockEntity> CUSTOM_VITRAUX;
-    public static BlockEntityType<GlaziersBenchBlockEntity> GLAZIERS_BENCH;
+    public static BlockEntityType<CustomVitrauxBlockEntity>  CUSTOM_VITRAUX;
+    public static BlockEntityType<GlaziersBenchBlockEntity>  GLAZIERS_BENCH;
 
     public static void register() {
         CUSTOM_VITRAUX = Registry.register(

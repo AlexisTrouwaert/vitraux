@@ -23,7 +23,16 @@
 
   "item.vitraux.pincette": "Glazier's Pincers",
   "item.vitraux.template": "Vitraux Template",
+  "item.vitraux.blank_template": "Blank Template",
+  "item.vitraux.blueprint": "Vitraux Blueprint",
 
   "container.vitraux.glaziers_bench": "Glazier's Bench",
-  "gui.vitraux.create_template": "Create Template"
+  "gui.vitraux.create_template": "Create Template",
+  "gui.vitraux.create_button": "Create",
+  "gui.vitraux.save_design": "Save Design",
+  "gui.vitraux.load_design": "Reload",
+  "gui.vitraux.template_name": "Name",
+  "gui.vitraux.insert_hint": "Insert a blank template",
+  "gui.vitraux.insert_blueprint_hint": "Insert a saved design to load it (optional)",
+  "tooltip.vitraux.canvas_size": "%s x %s cells"
 }

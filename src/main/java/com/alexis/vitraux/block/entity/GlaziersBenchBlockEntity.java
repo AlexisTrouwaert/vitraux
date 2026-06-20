@@ -3,15 +3,20 @@ package com.alexis.vitraux.block.entity;
 import com.alexis.vitraux.registry.ModBlockEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-public class GlaziersBenchBlockEntity extends BlockEntity {
+public class GlaziersBenchBlockEntity extends BlockEntity implements Inventory {
 
     public static final int MAX_W = 4;
     public static final int MAX_H = 4;
@@ -21,6 +26,9 @@ public class GlaziersBenchBlockEntity extends BlockEntity {
     private int canvasHeight = 1;
     // pixels[y * canvasWidth*CELL + x], value 0-15 = DyeColor, 16 = transparent
     private byte[] pixels = new byte[MAX_W * CELL * MAX_H * CELL];
+
+    // Slot 0 = blank template consumed when creating a template, slot 1 = saved blueprint (reusable)
+    private final DefaultedList<ItemStack> templateSlot = DefaultedList.ofSize(2, ItemStack.EMPTY);
 
     public GlaziersBenchBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.GLAZIERS_BENCH, pos, state);
@@ -42,7 +50,7 @@ public class GlaziersBenchBlockEntity extends BlockEntity {
     }
 
     public void setPixel(int px, int py, byte color) {
-        int stride = canvasWidth * CELL;
+        int stride = MAX_W * CELL;
         if (px < 0 || py < 0 || px >= canvasWidth * CELL || py >= canvasHeight * CELL) return;
         pixels[py * stride + px] = color;
         markDirty();
@@ -60,6 +68,61 @@ public class GlaziersBenchBlockEntity extends BlockEntity {
         return out;
     }
 
+    /** Replaces the canvas dimensions and pixel data, e.g. when loading a saved blueprint. */
+    public void loadDesign(int width, int height, byte[] data) {
+        canvasWidth  = Math.clamp(width, 1, MAX_W);
+        canvasHeight = Math.clamp(height, 1, MAX_H);
+        int srcStride = width  * CELL;
+        int dstStride = MAX_W  * CELL;
+        int copyW = Math.min(srcStride, dstStride);
+        int copyH = Math.min(height * CELL, MAX_H * CELL);
+        for (int row = 0; row < copyH; row++) {
+            System.arraycopy(data, row * srcStride, pixels, row * dstStride, copyW);
+        }
+        markDirty();
+    }
+
+    // ── Inventory (slot 0 = blank template, slot 1 = saved blueprint) ───────────
+
+    @Override
+    public int size() { return 2; }
+
+    @Override
+    public boolean isEmpty() { return templateSlot.get(0).isEmpty() && templateSlot.get(1).isEmpty(); }
+
+    @Override
+    public ItemStack getStack(int slot) { return templateSlot.get(slot); }
+
+    @Override
+    public ItemStack removeStack(int slot, int amount) {
+        ItemStack result = Inventories.splitStack(templateSlot, slot, amount);
+        if (!result.isEmpty()) markDirty();
+        return result;
+    }
+
+    @Override
+    public ItemStack removeStack(int slot) {
+        ItemStack result = templateSlot.get(slot);
+        templateSlot.set(slot, ItemStack.EMPTY);
+        markDirty();
+        return result;
+    }
+
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        templateSlot.set(slot, stack);
+        markDirty();
+    }
+
+    @Override
+    public boolean canPlayerUse(PlayerEntity player) { return true; }
+
+    @Override
+    public void clear() {
+        templateSlot.clear();
+        markDirty();
+    }
+
     // ── NBT persistence ───────────────────────────────────────────────────────
 
     @Override
@@ -68,6 +131,7 @@ public class GlaziersBenchBlockEntity extends BlockEntity {
         nbt.putByte("CanvasWidth",  (byte) canvasWidth);
         nbt.putByte("CanvasHeight", (byte) canvasHeight);
         nbt.putByteArray("Pixels", pixels);
+        Inventories.writeNbt(nbt, templateSlot, registries);
     }
 
     @Override
@@ -79,6 +143,7 @@ public class GlaziersBenchBlockEntity extends BlockEntity {
         if (saved.length == pixels.length) {
             pixels = saved;
         }
+        Inventories.readNbt(nbt, templateSlot, registries);
     }
 
     @Override

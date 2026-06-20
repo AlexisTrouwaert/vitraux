@@ -1,6 +1,7 @@
 package com.alexis.vitraux.registry;
 
 import com.alexis.vitraux.VitrauxMod;
+import com.alexis.vitraux.item.BlueprintItem;
 import com.alexis.vitraux.item.TemplateItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -13,6 +14,8 @@ public class ModItems {
 
     public static final Item PINCETTE = new Item(new Item.Settings().maxCount(1));
     public static final Item TEMPLATE = new TemplateItem(new Item.Settings().maxCount(16));
+    public static final Item BLANK_TEMPLATE = new Item(new Item.Settings());
+    public static final Item BLUEPRINT = new BlueprintItem(new Item.Settings().maxCount(16));
 
     public static void register() {
         // Coloured vitraux block items
@@ -34,5 +37,7 @@ public class ModItems {
         // Tools / items
         Registry.register(Registries.ITEM, Identifier.of(VitrauxMod.MOD_ID, "pincette"), PINCETTE);
         Registry.register(Registries.ITEM, Identifier.of(VitrauxMod.MOD_ID, "template"), TEMPLATE);
+        Registry.register(Registries.ITEM, Identifier.of(VitrauxMod.MOD_ID, "blank_template"), BLANK_TEMPLATE);
+        Registry.register(Registries.ITEM, Identifier.of(VitrauxMod.MOD_ID, "blueprint"), BLUEPRINT);
     }
 }

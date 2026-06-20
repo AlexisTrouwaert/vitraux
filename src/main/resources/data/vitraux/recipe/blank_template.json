@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "SPS",
+    "SSS"
+  ],
+  "key": {
+    "S": { "item": "minecraft:stick" },
+    "P": { "item": "minecraft:paper" }
+  },
+  "result": {
+    "id": "vitraux:blank_template",
+    "count": 1
+  }
+}

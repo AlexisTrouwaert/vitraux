@@ -10,7 +10,10 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -34,6 +37,37 @@ public class TemplateItem extends Item {
         nbt.putByte(NBT_HEIGHT, (byte) height);
         nbt.putByteArray(NBT_PIXELS, pixels);
         stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+    }
+
+    public record CanvasData(int width, int height, byte[] pixels) {}
+
+    /** Read canvas data back out of an ItemStack written by {@link #writeData}, or null if absent/invalid. */
+    public static CanvasData readData(ItemStack stack) {
+        NbtComponent comp = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
+        NbtCompound nbt = comp.copyNbt();
+        if (nbt.isEmpty()) return null;
+
+        int width  = nbt.getByte(NBT_WIDTH)  & 0xFF;
+        int height = nbt.getByte(NBT_HEIGHT) & 0xFF;
+        byte[] pixels = nbt.getByteArray(NBT_PIXELS);
+        if (width == 0 || height == 0 || pixels.length != width * 16 * height * 16) return null;
+
+        return new CanvasData(width, height, pixels);
+    }
+
+    /** Appends a "W x H cells" tooltip line so designs stay distinguishable even when sharing a name. */
+    public static void appendCanvasTooltip(ItemStack stack, List<Text> tooltip) {
+        CanvasData data = readData(stack);
+        if (data != null) {
+            tooltip.add(Text.translatable("tooltip.vitraux.canvas_size", data.width(), data.height())
+                .formatted(Formatting.GRAY));
+        }
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
+        appendCanvasTooltip(stack, tooltip);
     }
 
     /**

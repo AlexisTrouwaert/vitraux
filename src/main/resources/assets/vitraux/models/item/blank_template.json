@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "vitraux:block/blank_vitraux"
+    "layer0": "vitraux:item/blank_template"
   }
 }

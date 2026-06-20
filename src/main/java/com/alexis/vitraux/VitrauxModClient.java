@@ -5,9 +5,11 @@ import com.alexis.vitraux.client.VitrauxIrisCompat;
 import com.alexis.vitraux.client.VitrauxShaderCompat;
 import com.alexis.vitraux.client.VitrauxShaderInstaller;
 import com.alexis.vitraux.client.renderer.CustomVitrauxBlockEntityRenderer;
+import com.alexis.vitraux.client.renderer.DesignIconRenderer;
 import com.alexis.vitraux.network.CanvasSyncS2CPayload;
 import com.alexis.vitraux.registry.ModBlockEntities;
 import com.alexis.vitraux.registry.ModBlocks;
+import com.alexis.vitraux.registry.ModItems;
 import com.alexis.vitraux.screen.GlaziersBenchScreen;
 import com.alexis.vitraux.screen.GlaziersBenchScreenHandler;
 import com.alexis.vitraux.registry.ModScreenHandlers;
@@ -17,6 +19,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -51,6 +54,10 @@ public class VitrauxModClient implements ClientModInitializer {
 
         // Block entity renderer
         BlockEntityRendererRegistry.register(ModBlockEntities.CUSTOM_VITRAUX, CustomVitrauxBlockEntityRenderer::new);
+
+        // Dynamic item icons: render the actual saved design directly on the item
+        BuiltinItemRendererRegistry.INSTANCE.register(ModItems.TEMPLATE,  new DesignIconRenderer(false));
+        BuiltinItemRendererRegistry.INSTANCE.register(ModItems.BLUEPRINT, new DesignIconRenderer(true));
 
         // GUI screen
         HandledScreens.register(ModScreenHandlers.GLAZIERS_BENCH, GlaziersBenchScreen::new);

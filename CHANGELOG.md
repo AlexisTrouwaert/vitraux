@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.2.14b] — 2026-06-20
+
+### Added
+- **`vitraux:blank_template`** — craftable item (8 sticks + 1 paper) required to create a template at the Glazier's Bench; consumed on use instead of templates being free
+- **`vitraux:blueprint`** — reusable, non-consumable item that permanently stores a canvas design; lets you reproduce a design without redrawing it
+  - **Save Design** button at the bench captures the current canvas into a new Blueprint
+  - Inserting a filled Blueprint into its slot **auto-loads** its design into the canvas (no button hunting required); a manual **Reload** button is also available to revert after further edits
+  - Inserting a named Blueprint pre-fills the Template/Blueprint name field with its name; removing it resets the field back to "Template"
+- **Player inventory access in the Glazier's Bench** — full 36-slot inventory + hotbar added to the GUI so items can actually be moved in and out
+- **Two-stage Glazier's Bench GUI** — opening the bench now shows only the input slots + inventory until a blank template or blueprint is inserted; the canvas/editor/palette tools unlock once something is loaded
+- **Dynamic item icons** — Template and Blueprint items render their actual saved design directly on the item (inventory, hand, ground) via a custom builtin item renderer, instead of a static placeholder texture
+  - Template: design + dashed gray frame ("sketch" look)
+  - Blueprint: design + solid frame ("finished" look)
+- **Tooltip canvas size** — Template/Blueprint tooltips show a "W x H cells" line so designs stay distinguishable even when sharing a name
+
+### Fixed
+- **Typing in the name field moved the player / closed the GUI** — `W`/`A`/`S`/`D`/`E` leaked through to movement and inventory-toggle keybindings while the text field was focused; all key events are now fully captured while it has focus
+- **No tooltip when hovering items/slots inside the Glazier's Bench GUI** — `HandledScreen` never calls `drawMouseoverTooltip()` on its own; the screen now triggers it explicitly after `render()`
+- **Blueprint reload showed a shifted/cut-off design** — `setPixel()` indexed the canvas buffer using the active canvas width instead of the buffer's fixed stride, corrupting any saved design narrower than the max canvas size with 2+ rows
+
 ## [0.2.3b] — 2026-06-19
 
 ### Added
